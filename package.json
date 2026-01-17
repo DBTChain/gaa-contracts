@@ -11,13 +11,16 @@
     "deploy:dept": "hardhat run scripts/deploy-department.ts",
     "deploy:amoy": "hardhat run scripts/deploy.ts --network amoy",
     "deploy:polygon": "hardhat run scripts/deploy.ts --network polygon",
-    "verify": "hardhat verify"
+    "verify": "hardhat verify",
+    "sync": "hardhat run sync-scripts/sync-budgets.ts",
+    "sync:amoy": "hardhat run sync-scripts/sync-budgets.ts --network amoy"
   },
   "keywords": [],
   "author": "Jason Cruz",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@azure/cosmos": "^4.9.0",
     "@dpa-oss/dpa": "^1.0.1",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "dotenv": "^17.2.3",

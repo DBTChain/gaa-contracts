@@ -6,9 +6,25 @@ import "./Agency.sol";
 import "./shared/GAATypes.sol";
 import "./shared/GAAErrors.sol";
 
-// Forward declaration
+// Forward declaration - extended for responsible department functions
 interface IDBCForDepartment {
     function currentPhase() external view returns (GAATypes.Phase);
+
+    // Phase transition functions (only callable by responsible departments)
+    function transitionToEnactment() external;
+
+    function transitionToFinality() external;
+
+    function completeAndReset() external;
+
+    // SPF functions (only callable by responsible minting department)
+    function submitSPFExpenditure(
+        GAATypes.SPFInput calldata input
+    ) external returns (uint256 tokenId);
+
+    function reviseSPFExpenditure(
+        GAATypes.SPFRevisionInput calldata input
+    ) external returns (uint256 newTokenId);
 }
 
 /**
@@ -228,5 +244,62 @@ contract Department is Ownable {
     {
         Agency agency = Agency(agencyAddress);
         return (agency.code(), agency.name());
+    }
+
+    // ============ SPF Functions (for Responsible Department) ============
+
+    /**
+     * @notice Submit an SPF expenditure to the DBC
+     * @dev Only callable by owner. This department must be the responsible minting department.
+     * @param input SPFInput struct with all expenditure details
+     * @return tokenId The minted token ID
+     */
+    function submitSPFExpenditure(
+        GAATypes.SPFInput calldata input
+    ) external onlyOwner returns (uint256 tokenId) {
+        IDBCForDepartment dbcContract = IDBCForDepartment(dbc);
+        tokenId = dbcContract.submitSPFExpenditure(input);
+    }
+
+    /**
+     * @notice Revise an existing SPF expenditure
+     * @dev Only callable by owner. This department must be the responsible minting department.
+     * @param input SPFRevisionInput struct with revision details
+     * @return newTokenId The new token ID after revision
+     */
+    function reviseSPFExpenditure(
+        GAATypes.SPFRevisionInput calldata input
+    ) external onlyOwner returns (uint256 newTokenId) {
+        IDBCForDepartment dbcContract = IDBCForDepartment(dbc);
+        newTokenId = dbcContract.reviseSPFExpenditure(input);
+    }
+
+    // ============ Phase Transition Functions (for Responsible Departments) ============
+
+    /**
+     * @notice Transition from Minting to Enactment phase
+     * @dev Only callable by owner. This department must be the responsible minting department.
+     */
+    function transitionToEnactment() external onlyOwner {
+        IDBCForDepartment dbcContract = IDBCForDepartment(dbc);
+        dbcContract.transitionToEnactment();
+    }
+
+    /**
+     * @notice Transition from Enactment to Finality phase
+     * @dev Only callable by owner. This department must be the responsible enactment department.
+     */
+    function transitionToFinality() external onlyOwner {
+        IDBCForDepartment dbcContract = IDBCForDepartment(dbc);
+        dbcContract.transitionToFinality();
+    }
+
+    /**
+     * @notice Complete current fiscal year and reset to Preparation phase
+     * @dev Only callable by owner. This department must be the responsible enactment department.
+     */
+    function completeAndReset() external onlyOwner {
+        IDBCForDepartment dbcContract = IDBCForDepartment(dbc);
+        dbcContract.completeAndReset();
     }
 }

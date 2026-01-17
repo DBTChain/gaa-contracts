@@ -68,19 +68,38 @@ describe("GAA Contracts", function () {
       console.log("  ✓ Registration verified");
     });
 
-    it("Should transition phases correctly", async function () {
-      const { dbc, dept } = await loadFixture(deployAllFixture);
+    it("Should transition phases correctly through Department", async function () {
+      const { dbc, dept, owner } = await loadFixture(deployAllFixture);
       const deptAddr = await dept.getAddress();
       
-      // Register and set responsible
+      // Register and set responsible departments (DBM for both minting and enactment)
       await dbc.registerDepartment("DBM", deptAddr);
       await dbc.setResponsibleDepartments(deptAddr, deptAddr);
       
-      // Prep -> Minting
+      // Prep -> Minting (owner can call directly on DBC)
+      expect(await dbc.currentPhase()).to.equal(0); // Preparation
       await dbc.transitionToMinting();
-      expect(await dbc.currentPhase()).to.equal(1);
+      expect(await dbc.currentPhase()).to.equal(1); // Minting
+      console.log("  ✓ Prep -> Minting (via DBC)");
       
-      console.log("  ✓ Phase transition verified");
+      // Minting -> Enactment (must go through Department as responsible)
+      // Note: owner deployed dept, so owner is dept owner
+      await dept.transitionToEnactment();
+      expect(await dbc.currentPhase()).to.equal(2); // Enactment
+      console.log("  ✓ Minting -> Enactment (via Department)");
+      
+      // Enactment -> Finality (must go through Department as responsible)
+      await dept.transitionToFinality();
+      expect(await dbc.currentPhase()).to.equal(3); // Finality
+      console.log("  ✓ Enactment -> Finality (via Department)");
+      
+      // Finality -> Preparation + new FY (must go through Department)
+      await dept.completeAndReset();
+      expect(await dbc.currentPhase()).to.equal(0); // Preparation
+      expect(await dbc.fiscalYear()).to.equal(2027);
+      console.log("  ✓ Finality -> Preparation (via Department)");
+      
+      console.log("  ✓ Full phase lifecycle verified");
     });
   });
 
