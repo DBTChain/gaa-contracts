@@ -50,7 +50,8 @@ const config: HardhatUserConfig = {
         network: "amoy",
         chainId: 80002,
         urls: {
-          apiURL: "https://api-amoy.polygonscan.com/api",
+          // Use mainnet API with chainid parameter for v2 compatibility
+          apiURL: "https://api.etherscan.io/v2/api?chainid=80002",
           browserURL: "https://amoy.polygonscan.com",
         },
       },
@@ -58,7 +59,8 @@ const config: HardhatUserConfig = {
         network: "polygon",
         chainId: 137,
         urls: {
-          apiURL: "https://api.polygonscan.com/api",
+          // Use mainnet API with chainid parameter for v2 compatibility
+          apiURL: "https://api.etherscan.io/v2/api?chainid=137",
           browserURL: "https://polygonscan.com",
         },
       }
