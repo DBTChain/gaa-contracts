@@ -5,7 +5,8 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 // Get environment variables with defaults
-const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001";
+const GAA_DBC_PK = process.env.GAA_DBC_PK || "0x0000000000000000000000000000000000000000000000000000000000000001";
+const GAA_DPA_PK = process.env.GAA_DPA_PK || "0x0000000000000000000000000000000000000000000000000000000000000001";
 const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "";
 
 const config: HardhatUserConfig = {
@@ -28,31 +29,39 @@ const config: HardhatUserConfig = {
     amoy: {
       url: process.env.AMOY_RPC_URL || "https://rpc-amoy.polygon.technology",
       chainId: 80002,
-      accounts: [PRIVATE_KEY],
+      accounts: [GAA_DBC_PK, GAA_DPA_PK],
       gasPrice: "auto",
     },
     // Polygon Mainnet
     polygon: {
       url: process.env.POLYGON_RPC_URL || "https://polygon-rpc.com",
       chainId: 137,
-      accounts: [PRIVATE_KEY],
+      accounts: [GAA_DBC_PK, GAA_DPA_PK],
       gasPrice: "auto",
     },
   },
   etherscan: {
     apiKey: {
       polygon: POLYGONSCAN_API_KEY,
-      polygonAmoy: POLYGONSCAN_API_KEY,
+      amoy: POLYGONSCAN_API_KEY,
     },
     customChains: [
       {
-        network: "polygonAmoy",
+        network: "amoy",
         chainId: 80002,
         urls: {
           apiURL: "https://api-amoy.polygonscan.com/api",
           browserURL: "https://amoy.polygonscan.com",
         },
       },
+      {
+        network: "polygon",
+        chainId: 137,
+        urls: {
+          apiURL: "https://api.polygonscan.com/api",
+          browserURL: "https://polygonscan.com",
+        },
+      }
     ],
   },
   gasReporter: {

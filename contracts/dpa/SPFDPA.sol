@@ -28,7 +28,9 @@ contract SPFDPA is DPA {
      */
     constructor(
         address orchestrator_
-    ) DPA("GAA Special Purpose Funds", "GAA-SPF", orchestrator_) {}
+    ) DPA("GAA Special Purpose Funds", "GAA-SPF", orchestrator_) {
+        _baseTokenURI = "https://emerald-certain-muskox-778.mypinata.cloud/ipfs/";
+    }
 
     // ============ View Functions ============
 

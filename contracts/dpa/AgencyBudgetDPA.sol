@@ -28,7 +28,9 @@ contract AgencyBudgetDPA is DPA {
      */
     constructor(
         address orchestrator_
-    ) DPA("GAA Agency Budget", "GAA-AGENCY", orchestrator_) {}
+    ) DPA("GAA Agency Budget", "GAA-AGENCY", orchestrator_) {
+        _baseTokenURI = "https://emerald-certain-muskox-778.mypinata.cloud/ipfs/";
+    }
 
     // ============ View Functions ============
 

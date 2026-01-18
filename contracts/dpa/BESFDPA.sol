@@ -17,7 +17,9 @@ contract BESFDPA is DPA {
      */
     constructor(
         address orchestrator_
-    ) DPA("GAA BESF", "GAA-BESF", orchestrator_) {}
+    ) DPA("GAA BESF", "GAA-BESF", orchestrator_) {
+        _baseTokenURI = "https://emerald-certain-muskox-778.mypinata.cloud/ipfs/";
+    }
 
     // ============ Internal Functions ============
 

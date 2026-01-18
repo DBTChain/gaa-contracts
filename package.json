@@ -13,7 +13,9 @@
     "deploy:polygon": "hardhat run scripts/deploy.ts --network polygon",
     "verify": "hardhat verify",
     "sync": "hardhat run sync-scripts/sync-budgets.ts",
-    "sync:amoy": "hardhat run sync-scripts/sync-budgets.ts --network amoy"
+    "sync:amoy": "hardhat run sync-scripts/sync-budgets.ts --network amoy",
+    "upload:ipfs": "npx ts-node sync-scripts/upload-ipfs.ts",
+    "upload:ipfs:amoy": "npx ts-node sync-scripts/upload-ipfs.ts"
   },
   "keywords": [],
   "author": "Jason Cruz",
@@ -21,7 +23,7 @@
   "description": "",
   "dependencies": {
     "@azure/cosmos": "^4.9.0",
-    "@dpa-oss/dpa": "^1.0.1",
+    "@dpa-oss/dpa": "^1.0.3",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "dotenv": "^17.2.3",
     "hardhat": "^2.28.3"
