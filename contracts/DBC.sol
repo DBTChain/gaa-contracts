@@ -95,6 +95,13 @@ contract DBC is Ownable, ReentrancyGuard, Pausable {
         uint256 amount
     );
 
+    /// @notice Emitted when BESF expenditure is submitted
+    /// @dev Content structure is flexible - no specific fields emitted
+    event BESFExpenditureSubmitted(
+        uint256 indexed tokenId,
+        address indexed submitter
+    );
+
     // ============ Modifiers ============
 
     /// @dev Only allow during Preparation phase
@@ -531,6 +538,51 @@ contract DBC is Ownable, ReentrancyGuard, Pausable {
             encodedContent,
             input.reason
         );
+    }
+
+    // ============ BESF Expenditure Functions ============
+    // Note: BESF uses raw bytes for content to allow flexible content structure.
+    // The content encoding is handled by the caller and BESF DPA.
+
+    function submitBESFExpenditure(
+        string calldata uri,
+        bytes calldata content
+    )
+        external
+        onlyResponsibleMinting
+        onlyMinting
+        nonReentrant
+        whenNotPaused
+        returns (uint256 tokenId)
+    {
+        address dpaAddress = besfDPA[fiscalYear];
+        if (dpaAddress == address(0)) revert GAAErrors.DPANotDeployed();
+
+        tokenId = IBESFDPA(dpaAddress).mint(msg.sender, uri, content);
+        emit BESFExpenditureSubmitted(tokenId, msg.sender);
+    }
+
+    function reviseBESFExpenditure(
+        uint256 tokenId,
+        string calldata uri,
+        bytes calldata content,
+        string calldata reason
+    )
+        external
+        onlyResponsibleMinting
+        onlyMinting
+        nonReentrant
+        whenNotPaused
+        returns (uint256 newTokenId)
+    {
+        address dpaAddress = besfDPA[fiscalYear];
+        if (dpaAddress == address(0)) revert GAAErrors.DPANotDeployed();
+
+        IBESFDPA dpa = IBESFDPA(dpaAddress);
+        if (dpa.ownerOf(tokenId) != msg.sender)
+            revert GAAErrors.NotTokenOwner();
+
+        newTokenId = dpa.revise(tokenId, uri, content, reason);
     }
 
     // ============ View Functions ============

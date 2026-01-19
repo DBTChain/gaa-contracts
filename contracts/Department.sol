@@ -25,6 +25,20 @@ interface IDBCForDepartment {
     function reviseSPFExpenditure(
         GAATypes.SPFRevisionInput calldata input
     ) external returns (uint256 newTokenId);
+
+    // BESF functions (only callable by responsible minting department)
+    // Note: BESF uses raw bytes for content to allow flexible content structure
+    function submitBESFExpenditure(
+        string calldata uri,
+        bytes calldata content
+    ) external returns (uint256 tokenId);
+
+    function reviseBESFExpenditure(
+        uint256 tokenId,
+        string calldata uri,
+        bytes calldata content,
+        string calldata reason
+    ) external returns (uint256 newTokenId);
 }
 
 /**
@@ -272,6 +286,49 @@ contract Department is Ownable {
     ) external onlyOwner returns (uint256 newTokenId) {
         IDBCForDepartment dbcContract = IDBCForDepartment(dbc);
         newTokenId = dbcContract.reviseSPFExpenditure(input);
+    }
+
+    // ============ BESF Functions (for Responsible Department) ============
+    // Note: BESF uses raw bytes for content to allow flexible content structure.
+    // The content encoding is handled by the caller.
+
+    /**
+     * @notice Submit a BESF expenditure to the DBC
+     * @dev Only callable by owner. This department must be the responsible minting department.
+     * @param uri Token URI (typically IPFS CID)
+     * @param content ABI-encoded content (structure defined by caller/DPA)
+     * @return tokenId The minted token ID
+     */
+    function submitBESFExpenditure(
+        string calldata uri,
+        bytes calldata content
+    ) external onlyOwner returns (uint256 tokenId) {
+        IDBCForDepartment dbcContract = IDBCForDepartment(dbc);
+        tokenId = dbcContract.submitBESFExpenditure(uri, content);
+    }
+
+    /**
+     * @notice Revise an existing BESF expenditure
+     * @dev Only callable by owner. This department must be the responsible minting department.
+     * @param tokenId Token ID to revise
+     * @param uri New token URI
+     * @param content New ABI-encoded content
+     * @param reason Reason for revision
+     * @return newTokenId The new token ID after revision
+     */
+    function reviseBESFExpenditure(
+        uint256 tokenId,
+        string calldata uri,
+        bytes calldata content,
+        string calldata reason
+    ) external onlyOwner returns (uint256 newTokenId) {
+        IDBCForDepartment dbcContract = IDBCForDepartment(dbc);
+        newTokenId = dbcContract.reviseBESFExpenditure(
+            tokenId,
+            uri,
+            content,
+            reason
+        );
     }
 
     // ============ Phase Transition Functions (for Responsible Departments) ============

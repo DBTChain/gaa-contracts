@@ -14,6 +14,7 @@
     "verify": "hardhat verify",
     "sync": "hardhat run sync-scripts/sync-budgets.ts",
     "sync:amoy": "hardhat run sync-scripts/sync-budgets.ts --network amoy",
+    "sync:polygon": "hardhat run sync-scripts/sync-budgets.ts --network polygon",
     "upload:ipfs": "npx ts-node sync-scripts/upload-ipfs.ts",
     "upload:ipfs:amoy": "npx ts-node sync-scripts/upload-ipfs.ts"
   },
